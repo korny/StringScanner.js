@@ -1,0 +1,129 @@
+body.jspec {
+  margin: 45px 0;
+  font: 12px "Helvetica Neue Light", "Lucida Grande", "Calibri", "Arial", sans-serif;
+  background: #456;
+  text-align: center;
+}
+#jspec {
+  margin: 0 auto;
+  width: 1008px;
+  background: url(vr.png) top left repeat-y;
+  text-align: left;
+}
+#jspec-top {
+  position: relative;
+  margin: 0 auto;
+  width: 1008px;
+  height: 15px;
+  background: url(sprites.bg.png) top left no-repeat;
+}
+#jspec-bottom {
+  margin: 0 auto;
+  width: 1008px;
+  height: 15px;
+  background: url(sprites.bg.png) bottom left no-repeat;
+}
+#jspec .loading {
+  width: 1008px;
+  height: 80px;
+  background: url(loading.gif) 50% 50% no-repeat;
+}
+#jspec-report * {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+}
+#jspec-report {
+  padding: 15px 40px;
+  font: 11px "Helvetica Neue Light", "Lucida Grande", "Calibri", "Arial", sans-serif;
+}
+#jspec-report.has-failures {
+  padding-bottom: 30px;
+}
+#jspec-report .hidden {
+  display: none;
+}
+#jspec-report .heading {
+  margin-bottom: 15px;
+}
+#jspec-report .heading span {
+  padding-right: 10px;
+}
+#jspec-report .heading .passes em {
+  color: #0ea0eb;
+}
+#jspec-report .heading .failures em {
+  color: #FA1616;
+}
+#jspec-report table {
+  font-size: 11px;
+  border-collapse: collapse;
+}
+#jspec-report td {
+  padding: 8px;
+  text-indent: 30px;
+}
+#jspec-report tr.body {
+  display: none;
+}
+#jspec-report tr.body pre {
+  margin: 0;
+  padding: 0 0 5px 25px;
+}
+#jspec-report tr.even:hover + tr.body, 
+#jspec-report tr.odd:hover + tr.body {
+  display: block;
+}
+#jspec-report tr td:first-child em {
+  display: block;
+  clear: both;
+  font-style: normal;
+  font-weight: normal;
+}
+#jspec-report tr.even:hover, 
+#jspec-report tr.odd:hover {
+  background: #F2F5F7;
+}
+#jspec-report td + td {
+  padding-right: 0;
+  width: 15px;
+}
+#jspec-report td.pass {
+  background: url(sprites.png) 3px -7px no-repeat;
+}
+#jspec-report td.fail {
+  background: url(sprites.png) 3px -158px no-repeat;
+  font-weight: bold;
+  color: #D82810;
+}
+#jspec-report td.requires-implementation {
+  background: url(sprites.png) 3px -333px no-repeat;
+  color: #37A;
+}
+#jspec-report tr.description td {
+  margin-top: 25px;
+  padding-top: 25px;
+  font-size: 12px;
+  font-weight: bold;
+  text-indent: 0;
+  color: #1a1a1a;
+}
+#jspec-report tr.description:first-child td {
+  border-top: none;  
+}
+#jspec-report .assertion {
+  display: block;
+  float: left;
+  margin: 0 0 0 1px;
+  padding: 0;
+  width: 1px;
+  height: 5px;
+  background: #789;
+}
+#jspec-report .assertion.failed {
+  background: red;
+}
+.jspec-sandbox {
+  display: none;
+}
