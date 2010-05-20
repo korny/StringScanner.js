@@ -1,47 +1,69 @@
 describe "StringScanner"
-  describe "new constructor"
-    it "requires a string argument"
-    end
-  end
-  
-  describe "#beginning_of_line()"
+  describe "beginning_of_line()"
     it "returns true if the scan pointer is at 0"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 0
+      StringScanner.beginning_of_line().should.be true
     end
     
     it "returns true if the scan pointer is immediately following a newline"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 6
+      StringScanner.beginning_of_line().should.be false
     end
     
     it "returns false if the scan pointer is not at 0 or immediately following a newline"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 6
+      StringScanner.beginning_of_line().should.be false
     end
   end
   
-  describe "#concat(string)"
+  describe "concat(string)"
     it "requires a string argument"
+      -{ StringScanner.concat() }.should.throw_error("ArgumentError: no string supplied to concat()")
     end
     
     it "appends the string argument to the original string being scanned"
+      StringScanner.str = "012345"
+      StringScanner.concat("678")
+      StringScanner.str.should.be "012345678"
     end
     
     it "does not affect the scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.concat("678")
+      StringScanner.ptr.should.be 2
+    end
+    
+    it "returns the StringScanner object"
+      StringScanner.concat("678").should.be StringScanner
     end
   end
   
-  describe "#eos()"
+  describe "eos()"
     it "returns true if the scan pointer is at the end of the string"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 6
+      StringScanner.eos().should.be true
     end
     
     it "returns false if the scan pointer is not at the end of the string"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.eos().should.be false
     end
   end
   
-  describe "#exist(pattern)"
+  describe "exist(regexp)"
     it "requires a regexp argument"
     end
     
-    it "returns null if the pattern is not matched anywhere beyond the scan pointer"
+    it "returns null if the regexp is not matched anywhere beyond the scan pointer"
     end
     
-    it "clears match data if the pattern is not matched"
+    it "clears match data if the regexp is not matched"
     end
     
     it "returns the length of the string between the scan pointer and the end of the matched string"
@@ -54,34 +76,53 @@ describe "StringScanner"
     end
   end
   
-  describe "#getch()"
+  describe "getch()"
     it "returns null if the scan pointer is at the end of the string"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 6
+      StringScanner.getch().should.be null
     end
     
     it "clears match data if the scan pointer is at the end of the string"
+      StringScanner.str = "012345"
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.getch()
+      StringScanner.matchdata.should.be null
     end
     
     it "returns the character after the scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.getch().should.be "2"
     end
     
     it "stores the returned character as match data"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.matchdata = null
+      StringScanner.getch()
+      StringScanner.matchdata.should.eql { last_ptr: 2, string: "2", captures: [] }
     end
     
     it "advances the scan pointer by one after returning a character"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.getch()
+      StringScanner.ptr.should.be 3
     end
   end
   
-  describe "#match(pattern)"
+  describe "match(regexp)"
     it "requires a regexp argument"
     end
     
-    it "returns null if the pattern is not matched from the current scan pointer"
+    it "returns null if the regexp is not matched from the current scan pointer"
     end
     
-    it "clears match data if the pattern is not matched"
+    it "clears match data if the regexp is not matched"
     end
     
-    it "returns the length of the match if the pattern is matched from the current scan pointer"
+    it "returns the length of the match if the regexp is matched from the current scan pointer"
     end
     
     it "stores the matched string as match data"
@@ -91,102 +132,168 @@ describe "StringScanner"
     end
   end
   
-  describe  "#matched()"
+  describe  "matched()"
     it "returns null if there is no match data"
+      StringScanner.str = "012345"
+      StringScanner.matchdata = null
+      StringScanner.matched().should.be null
     end
     
     it "returns the last matched string if match data exists"
+      StringScanner.str = "012345"
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.matched().should.be "012"
     end
   end
   
-  describe "#matched(integer)"
+  describe "matched(index)"
     it "returns null if there is no match data"
+      StringScanner.str = "012345"
+      StringScanner.matchdata = null
+      StringScanner.matched(1).should.be null
     end
     
-    it "returns null if there is no capture corresponding to the index indicated by the integer argument"
+    it "returns null if there is no capture corresponding to the index argument"
+      StringScanner.str = "012345"
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.matched(1).should.be null
     end
     
-    it "returns the capture corresponding to the index indicated by the integer argument"
+    it "returns the capture corresponding to the index argument"
+      StringScanner.str = "012345"
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.matched(0).should.be "1"
     end
   end
   
-  describe "#matched_size()"
-    it "returns null if #match has never been called"
+  describe "matched_size()"
+    it "returns null if there is no match data"
+      StringScanner.str = "012345"
+      StringScanner.matchdata = null
+      StringScanner.matched_size().should.be null
     end
     
-    it "returns null if #match returned null the last time it was called"
-    end
-    
-    it "returns the size of the the last matched string if #match returned a non-null result the last time it was called"
+    it "returns the size of the the last matched string if match returned a non-null result the last time it was called"
+      StringScanner.str = "012345"
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.matched_size().should.be 3
     end
   end
   
-  describe "#peek(length)"
+  describe "peek(length)"
     it "requires a length argument"
+      -{ StringScanner.peek() }.should.throw_error("ArgumentError: no length supplied to peek()")
     end
     
     it "returns an empty string if the scan pointer is at the end of the string"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 6
+      StringScanner.peek(2).should.be ""
     end
     
     it "returns only the remainder of the string if the scan pointer is closer to the end of the string than the given length"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 4
+      StringScanner.peek(10).should.be "45"
     end
     
-    it "returns a new string of the given length beginning after the scan pointer"
+    it "returns a new string of the given length beginning after the scan pointer if the end of the string is further away from the scan pointer than the given length"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.peek(2).should.be "23"
     end
     
     it "does not advance the scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.peek(2)
+      StringScanner.ptr.should.be 2
     end
   end
   
-  describe "#pointer()"
+  describe "pointer()"
     it "returns the index position of the scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.pointer().should.be 2
     end
   end
   
-  describe "#pointer(position)"
+  describe "pointer(position)"
     it "sets the index position of the scan pointer to the value of the position argument"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.pointer(4)
+      StringScanner.ptr.should.be 4
     end
     
     it "does not clear match data"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.pointer(4)
+      StringScanner.matchdata.should.eql { last_ptr: 0, string: "012", captures: ["1"] }
+    end
+    
+    it "returns the new scan pointer position"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.pointer(4).should.be 4
     end
     
     it "throws a RangeError if the position argument is outside the range of the string"
     end
   end
   
-  describe "#reset()"
+  describe "reset()"
     it "sets the scan pointer to zero"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 3
+      StringScanner.reset()
+      StringScanner.ptr.should.be 0
     end
     
     it "clears match data"
+      StringScanner.str = "012345"
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.reset()
+      StringScanner.matchdata.should.be null
     end
     
     it "returns the StringScanner object"
+      StringScanner.reset().should.be StringScanner
     end
   end
   
-  describe "#rest()"
+  describe "rest()"
     it "returns the portion of the string following the scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.rest().should.be "2345"
     end
     
     it "does not advance the scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.rest()
+      StringScanner.ptr.should.be 2
     end
   end
   
-  describe "#scan(pattern)"
+  describe "scan(regexp)"
     it "requires a regexp argument"
     end
     
-    it "returns null if the pattern is not matched from the current scan pointer"
+    it "returns null if the regexp is not matched from the current scan pointer"
     end
     
-    it "clears match data if the pattern is not matched"
+    it "clears match data if the regexp is not matched"
     end
     
-    it "does not advance the scan pointer if the pattern is not is matched"
+    it "does not advance the scan pointer if the regexp is not is matched"
     end
     
-    it "returns the matched string if the pattern is matched from the current scan pointer"
+    it "returns the matched string if the regexp is matched from the current scan pointer"
     end
     
     it "stores the matched string as match data"
@@ -196,17 +303,17 @@ describe "StringScanner"
     end
   end
   
-  describe "#scan_until(pattern)"
+  describe "scan_until(regexp)"
     it "requires a regexp argument"
     end
     
-    it "returns null if the pattern is not matched anywhere beyond the scan pointer"
+    it "returns null if the regexp is not matched anywhere beyond the scan pointer"
     end
     
-    it "clears match data if the pattern is not matched"
+    it "clears match data if the regexp is not matched"
     end
     
-    it "does not advance the scan pointer if the pattern is not is matched"
+    it "does not advance the scan pointer if the regexp is not is matched"
     end
     
     it "returns the string between the scan pointer and the end of the matched string"
@@ -219,20 +326,20 @@ describe "StringScanner"
     end
   end
   
-  describe "#skip(pattern)"
+  describe "skip(regexp)"
     it "requires a regexp argument"
     end
     
-    it "returns null if the pattern is not matched from the current scan pointer"
+    it "returns null if the regexp is not matched from the current scan pointer"
     end
     
-    it "clears match data if the pattern is not matched"
+    it "clears match data if the regexp is not matched"
     end
     
-    it "does not advance the scan pointer if the pattern is not matched"
+    it "does not advance the scan pointer if the regexp is not matched"
     end
     
-    it "returns the length of the match if the pattern is matched from the current scan pointer"
+    it "returns the length of the match if the regexp is matched from the current scan pointer"
     end
     
     it "stores the matched string as match data"
@@ -242,17 +349,17 @@ describe "StringScanner"
     end
   end
   
-  describe "#skip_until(pattern)"
+  describe "skip_until(regexp)"
     it "requires a regexp argument"
     end
     
-    it "returns null if the pattern is not matched anywhere beyond the scan pointer"
+    it "returns null if the regexp is not matched anywhere beyond the scan pointer"
     end
     
-    it "clears match data if the pattern is not matched"
+    it "clears match data if the regexp is not matched"
     end
     
-    it "does not advance the scan pointer if the pattern is not is matched"
+    it "does not advance the scan pointer if the regexp is not is matched"
     end
     
     it "returns the length of the string between the scan pointer and the end of the matched string"
@@ -265,41 +372,76 @@ describe "StringScanner"
     end
   end
   
-  describe "#string()"
+  describe "string()"
     it "returns the string being scanned"
+      StringScanner.str = "012345"
+      StringScanner.string().should.be "012345"
     end
   end
   
-  describe "#string(string)"
+  describe "string(string)"
     it "sets the string being scanned to the value of the string argument"
+      StringScanner.string("012345")
+      StringScanner.str.should.be "012345"
     end
     
     it "clears match data"
+      StringScanner.string("012345")
+      StringScanner.matchdata.should.be null
     end
     
     it "sets the scan pointer to zero"
+      StringScanner.string("012345")
+      StringScanner.ptr.should.be 0
     end
   end
   
-  describe "#terminate()"
+  describe "terminate()"
     it "advances the scan pointer to the end of the string"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 0
+      StringScanner.terminate()
+      StringScanner.ptr.should.be 6
     end
     
     it "clears match data"
+      StringScanner.str = "012345"
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.terminate()
+      StringScanner.matchdata.should.be null
     end
     
     it "returns the StringScanner object"
+      StringScanner.terminate().should.be StringScanner
     end
   end
   
-  describe "#unscan()"
+  describe "unscan()"
     it "throws an error if there is no match data"
+      StringScanner.str = "012345"
+      StringScanner.matchdata = null
+      -{ StringScanner.unscan() }.should.throw_error "Error: unscan() found no previous position"
     end
     
     it "clears match data"
+      StringScanner.str = "012345"
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.unscan()
+      StringScanner.matchdata.should.be null
     end
     
     it "moves the scan pointer to the scan pointer's last position before the previous match was found"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 5
+      StringScanner.matchdata = { last_ptr: 2, string: "234", captures: ["3"] }
+      StringScanner.unscan()
+      StringScanner.ptr.should.be 2
+    end
+    
+    it "returns the StringScanner object"
+      StringScanner.str = "012345"
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.unscan().should.be StringScanner
     end
   end
 end
