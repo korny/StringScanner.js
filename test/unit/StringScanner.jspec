@@ -58,21 +58,42 @@ describe "StringScanner"
   
   describe "exist(regexp)"
     it "requires a regexp argument"
+      -{ StringScanner.exist() }.should.throw_error("ArgumentError: no regexp supplied to exist()")
     end
     
     it "returns null if the regexp is not matched anywhere beyond the scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.exist(/67/).should.be null
     end
     
     it "clears match data if the regexp is not matched"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.exist(/67/)
+      StringScanner.matchdata.should.be null
     end
     
     it "returns the length of the string between the scan pointer and the end of the matched string"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.exist(/34/).should.be 3
     end
     
-    it "stores the matched string as match data"
+    it "stores the matched string and any captures as match data"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.matchdata = null
+      StringScanner.exist(/(3)4/)
+      StringScanner.matchdata.should.eql { last_ptr: 2, string: "34", captures: ["3"] }
     end
     
     it "does not advance the scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.exist(/34/)
+      StringScanner.ptr.should.be 2
     end
   end
   
@@ -114,21 +135,42 @@ describe "StringScanner"
   
   describe "match(regexp)"
     it "requires a regexp argument"
+      -{ StringScanner.match() }.should.throw_error("ArgumentError: no regexp supplied to match()")
     end
     
     it "returns null if the regexp is not matched from the current scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.match(/34/).should.be null
     end
     
     it "clears match data if the regexp is not matched"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.match(/34/)
+      StringScanner.matchdata.should.be null
     end
     
     it "returns the length of the match if the regexp is matched from the current scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.match(/234/).should.be 3
     end
     
-    it "stores the matched string as match data"
+    it "stores the matched string and any captures as match data"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.matchdata = null
+      StringScanner.match(/(2)(3)/)
+      StringScanner.matchdata.should.eql { last_ptr: 2, string: "23", captures: ["2", "3"] }
     end
     
     it "does not advance the scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.exist(/23/)
+      StringScanner.ptr.should.be 2
     end
   end
   
@@ -242,6 +284,7 @@ describe "StringScanner"
     end
     
     it "throws a RangeError if the position argument is outside the range of the string"
+      -{ StringScanner.pointer(10) }.should.throw_error "RangeError: out-of-range index supplied to pointer()"
     end
   end
   
@@ -282,93 +325,193 @@ describe "StringScanner"
   
   describe "scan(regexp)"
     it "requires a regexp argument"
+      -{ StringScanner.scan() }.should.throw_error("ArgumentError: no regexp supplied to scan()")
     end
     
     it "returns null if the regexp is not matched from the current scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.scan(/34/).should.be null
     end
     
     it "clears match data if the regexp is not matched"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.scan(/34/)
+      StringScanner.matchdata.should.be null
     end
     
     it "does not advance the scan pointer if the regexp is not is matched"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.scan(/34/)
+      StringScanner.ptr.should.be 2
     end
     
     it "returns the matched string if the regexp is matched from the current scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.scan(/23/).should.be "23"
     end
     
-    it "stores the matched string as match data"
+    it "stores the matched string and any captures as match data"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.scan(/(2)3/)
+      StringScanner.matchdata.should.eql { last_ptr: 2, string: "23", captures: ["2"] }
     end
     
     it "advances the scan pointer past the matched string"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.scan(/23/)
+      StringScanner.ptr.should.be 4
     end
   end
   
   describe "scan_until(regexp)"
     it "requires a regexp argument"
+      -{ StringScanner.scan_until() }.should.throw_error("ArgumentError: no regexp supplied to scan_until()")
     end
     
     it "returns null if the regexp is not matched anywhere beyond the scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.scan_until(/67/).should.be null
     end
     
     it "clears match data if the regexp is not matched"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.scan_until(/67/)
+      StringScanner.matchdata.should.be null
     end
     
     it "does not advance the scan pointer if the regexp is not is matched"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.scan_until(/67/)
+      StringScanner.ptr.should.be 2
     end
     
     it "returns the string between the scan pointer and the end of the matched string"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.scan_until(/34/).should.be "234"
     end
     
-    it "stores only the matched string as match data"
+    it "stores (only) the matched string and any captures as match data"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.scan_until(/(3)4/)
+      StringScanner.matchdata.should.eql { last_ptr: 2, string: "34", captures: ["3"]}
     end
     
     it "advances the scan pointer past the matched string"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.scan_until(/34/)
+      StringScanner.ptr.should.be 5
     end
   end
   
   describe "skip(regexp)"
     it "requires a regexp argument"
+      -{ StringScanner.skip() }.should.throw_error("ArgumentError: no regexp supplied to skip()")
     end
     
     it "returns null if the regexp is not matched from the current scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.skip(/34/).should.be null
     end
     
     it "clears match data if the regexp is not matched"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.skip(/34/)
+      StringScanner.matchdata.should.be null
     end
     
     it "does not advance the scan pointer if the regexp is not matched"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.skip(/34/)
+      StringScanner.ptr.should.be 2
     end
     
     it "returns the length of the match if the regexp is matched from the current scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.skip(/23/).should.be 2
     end
     
-    it "stores the matched string as match data"
+    it "stores the matched string and any captures as match data"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.skip(/(2)3/)
+      StringScanner.matchdata.should.eql { last_ptr: 2, string: "23", captures: ["2"] }
     end
     
     it "advances the scan pointer past the matched string"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.skip(/23/)
+      StringScanner.ptr.should.be 4
     end
   end
   
   describe "skip_until(regexp)"
     it "requires a regexp argument"
+      -{ StringScanner.skip_until() }.should.throw_error("ArgumentError: no regexp supplied to skip_until()")
     end
     
     it "returns null if the regexp is not matched anywhere beyond the scan pointer"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.skip_until(/67/).should.be null
     end
     
     it "clears match data if the regexp is not matched"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.skip_until(/67/)
+      StringScanner.matchdata.should.be null
     end
     
     it "does not advance the scan pointer if the regexp is not is matched"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.skip_until(/67/)
+      StringScanner.ptr.should.be 2
     end
     
     it "returns the length of the string between the scan pointer and the end of the matched string"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.skip_until(/34/).should.be 3
     end
     
-    it "stores only the matched string as match data"
+    it "stores (only) the matched string and any captures as match data"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.matchdata = { last_ptr: 0, string: "012", captures: ["1"] }
+      StringScanner.skip_until(/(3)4/)
+      StringScanner.matchdata.should.eql { last_ptr: 2, string: "34", captures: ["3"]}
     end
     
     it "advances the scan pointer past the matched string"
+      StringScanner.str = "012345"
+      StringScanner.ptr = 2
+      StringScanner.skip_until(/34/)
+      StringScanner.ptr.should.be 5
     end
   end
   

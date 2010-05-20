@@ -30,6 +30,26 @@ StringScanner.eos = function eos ()
     return StringScanner.ptr === StringScanner.str.length;
 }
 
+StringScanner.exist = function exist (regexp)
+{
+    if (regexp === undefined)
+    {
+        throw ("ArgumentError: no regexp supplied to exist()");
+    }
+    
+    var ptr = StringScanner.ptr;
+    var matchdata = regexp.exec(StringScanner.str.substr(ptr));
+    
+    if (!matchdata)
+    {
+        return StringScanner.matchdata = null;
+    }
+    
+    StringScanner.matchdata = { last_ptr: ptr, string: matchdata[0], captures: matchdata.slice(1) }
+    
+    return matchdata.index + ptr;
+}
+
 StringScanner.getch = function getch ()
 {
     var ptr = StringScanner.ptr;
@@ -45,6 +65,28 @@ StringScanner.getch = function getch ()
     StringScanner.matchdata = { last_ptr: ptr, string: character, captures: [] };
     
     return character;
+}
+
+StringScanner.match = function match (regexp)
+{
+    if (regexp === undefined)
+    {
+        throw ("ArgumentError: no regexp supplied to match()");
+    }
+    
+    var ptr = StringScanner.ptr;
+    var matchdata = (new RegExp('^' + regexp.source)).exec(StringScanner.str.substr(ptr));
+    
+    if (!matchdata)
+    {
+        return StringScanner.matchdata = null;
+    }
+    
+    var string = matchdata[0];
+    
+    StringScanner.matchdata = { last_ptr: ptr, string: string, captures: matchdata.slice(1) }
+    
+    return string.length;
 }
 
 StringScanner.matched = function matched (index)
@@ -94,16 +136,17 @@ StringScanner.peek = function peek (len)
 
 StringScanner.pointer = function pointer (position)
 {
-    if (position === undefined)
+    if ((position !== undefined) && (typeof(position = parseInt(position)) === 'number'))
     {
-        return StringScanner.ptr;
+        if ((position >= 0) && (position < StringScanner.str.length))
+        {
+            return StringScanner.ptr = position;
+        }
+        
+        throw ("RangeError: out-of-range index supplied to pointer()")
     }
     
-    if (typeof(position = parseInt(position)) === 'number')
-    {
-        
-        return StringScanner.ptr = position;
-    }
+    return StringScanner.ptr;
 }
 
 StringScanner.reset = function reset ()
@@ -117,6 +160,103 @@ StringScanner.reset = function reset ()
 StringScanner.rest = function rest ()
 {
     return StringScanner.str.substr(StringScanner.ptr);
+}
+
+StringScanner.scan = function scan (regexp)
+{
+    if (regexp === undefined)
+    {
+        throw ("ArgumentError: no regexp supplied to scan()");
+    }
+    
+    var ptr = StringScanner.ptr;
+    var matchdata = (new RegExp('^' + regexp.source)).exec(StringScanner.str.substr(ptr));
+    
+    if (!matchdata)
+    {
+        return StringScanner.matchdata = null;
+    }
+    
+    var string = matchdata[0];
+    
+    StringScanner.ptr += string.length;
+    StringScanner.matchdata = { last_ptr: ptr, string: string, captures: matchdata.slice(1) }
+    
+    return string;
+}
+
+StringScanner.scan_until = function scan_until (regexp)
+{
+    if (regexp === undefined)
+    {
+        throw ("ArgumentError: no regexp supplied to scan_until()");
+    }
+    
+    var str = StringScanner.str;
+    var ptr = StringScanner.ptr;
+    var matchdata = regexp.exec(str.substr(ptr));
+    
+    if (!matchdata)
+    {
+        return StringScanner.matchdata = null;
+    }
+    
+    var string = matchdata[0];
+    var offset = string.length + matchdata.index;
+    
+    StringScanner.ptr += offset;
+    StringScanner.matchdata = { last_ptr: ptr, string: string, captures: matchdata.slice(1) }
+    
+    return str.substr(ptr, offset);
+}
+
+StringScanner.skip = function skip (regexp)
+{
+    if (regexp === undefined)
+    {
+        throw ("ArgumentError: no regexp supplied to skip()");
+    }
+    
+    var ptr = StringScanner.ptr;
+    var matchdata = (new RegExp('^' + regexp.source)).exec(StringScanner.str.substr(ptr));
+    
+    if (!matchdata)
+    {
+        return StringScanner.matchdata = null;
+    }
+    
+    var string = matchdata[0];
+    var len = string.length;
+    
+    StringScanner.ptr += len;
+    StringScanner.matchdata = { last_ptr: ptr, string: string, captures: matchdata.slice(1) }
+    
+    return len;
+}
+
+StringScanner.skip_until = function skip_until (regexp)
+{
+    if (regexp === undefined)
+    {
+        throw ("ArgumentError: no regexp supplied to skip_until()");
+    }
+    
+    var str = StringScanner.str;
+    var ptr = StringScanner.ptr;
+    var matchdata = regexp.exec(str.substr(ptr));
+    
+    if (!matchdata)
+    {
+        return StringScanner.matchdata = null;
+    }
+    
+    var string = matchdata[0];
+    var offset = string.length + matchdata.index;
+    
+    StringScanner.ptr += offset;
+    StringScanner.matchdata = { last_ptr: ptr, string: string, captures: matchdata.slice(1) }
+    
+    return offset;
 }
 
 StringScanner.string = function string (string)
