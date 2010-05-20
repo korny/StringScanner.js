@@ -133,6 +133,27 @@ describe "StringScanner"
     end
   end
   
+  describe "init(string)"
+    it "requires a string argument"
+      -{ StringScanner.init() }.should.throw_error("ArgumentError: no string supplied to init()")
+    end
+    
+    it "sets the string being scanned to the value of the string argument"
+      StringScanner.string("012345")
+      StringScanner.str.should.be "012345"
+    end
+    
+    it "clears match data"
+      StringScanner.string("012345")
+      StringScanner.matchdata.should.be null
+    end
+    
+    it "sets the scan pointer to zero"
+      StringScanner.string("012345")
+      StringScanner.ptr.should.be 0
+    end
+  end
+  
   describe "match(regexp)"
     it "requires a regexp argument"
       -{ StringScanner.match() }.should.throw_error("ArgumentError: no regexp supplied to match()")

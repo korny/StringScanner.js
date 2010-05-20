@@ -67,6 +67,20 @@ StringScanner.getch = function getch ()
     return character;
 }
 
+StringScanner.init = function init (string)
+{
+    if (typeof(string) === 'string')
+    {
+        StringScanner.str = string;
+        StringScanner.matchdata = null;
+        StringScanner.ptr = 0;
+        
+        return StringScanner;
+    }
+    
+    throw ("ArgumentError: no string supplied to init()");
+}
+
 StringScanner.match = function match (regexp)
 {
     if (regexp === undefined)
