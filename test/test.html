@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="jspec/style.css"/>
+    <script type="text/javascript" charset="utf-8" src="jspec/core.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../StringScanner.js"></script>
+    <script>
+      function run_jspec() {
+        JSpec
+        .exec('unit/StringScanner.jspec')
+        .run()
+        .report()
+      }
+    </script>
+  </head>
+  <body class="jspec" onLoad="run_jspec();">
+    <div id="jspec-top">
+    </div>
+    <div id="jspec">
+      <div class="loading">
+      </div>
+    </div>
+    <div id="jspec-bottom">
+    </div>
+  </body>
+</html>
